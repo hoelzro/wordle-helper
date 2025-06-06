@@ -1,6 +1,7 @@
 let WORDS = [];
 const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 const letterStates = {};
+const tileElements = {};
 
 function createGrid() {
     const grid = document.getElementById('letter-grid');
@@ -12,19 +13,47 @@ function createGrid() {
             const div = document.createElement('div');
             div.className = 'tile';
             div.textContent = letter.toUpperCase();
-            div.addEventListener('click', () => cycleState(letter, div));
+            div.addEventListener('click', () => cycleState(letter));
             rowDiv.appendChild(div);
+            tileElements[letter] = div;
         });
         grid.appendChild(rowDiv);
     });
 }
 
-function cycleState(letter, element) {
+function setState(letter, state) {
+    letterStates[letter] = state;
+    const element = tileElements[letter];
+    if (element) {
+        element.className = 'tile' + (state !== 'unknown' ? ' ' + state : '');
+    }
+}
+
+function cycleState(letter) {
     const states = ['unknown', 'present', 'absent'];
     let idx = states.indexOf(letterStates[letter]);
     idx = (idx + 1) % states.length;
-    letterStates[letter] = states[idx];
-    element.className = 'tile' + (letterStates[letter] !== 'unknown' ? ' ' + letterStates[letter] : '');
+    setState(letter, states[idx]);
+    if (letterStates[letter] === 'absent') {
+        document.querySelectorAll('.positions input').forEach(input => {
+            if (input.value.toLowerCase() === letter) {
+                input.value = '';
+            }
+        });
+    }
+    filterWords();
+}
+
+function handlePositionInput(e) {
+    let val = e.target.value.toLowerCase().replace(/[^a-z]/g, '');
+    if (val.length > 1) val = val[0];
+    if (val && letterStates[val] === 'absent') {
+        val = '';
+    }
+    e.target.value = val;
+    if (val) {
+        setState(val, 'present');
+    }
     filterWords();
 }
 
@@ -68,7 +97,7 @@ async function loadWords() {
 document.addEventListener('DOMContentLoaded', () => {
     createGrid();
     document.querySelectorAll('.positions input').forEach(input => {
-        input.addEventListener('input', filterWords);
+        input.addEventListener('input', handlePositionInput);
     });
     loadWords();
 });
