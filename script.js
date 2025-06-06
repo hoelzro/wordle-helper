@@ -2,6 +2,7 @@ let WORDS = [];
 const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 const letterStates = {};
 const tileElements = {};
+const popupLetterElements = {};
 let activeInput = null;
 
 function createPopup() {
@@ -13,8 +14,9 @@ function createPopup() {
             const div = document.createElement('div');
             div.className = 'popup-letter';
             div.textContent = ch.toUpperCase();
+            popupLetterElements[ch] = div;
             div.addEventListener('click', () => {
-                if (activeInput) {
+                if (letterStates[ch] !== 'absent' && activeInput) {
                     activeInput.value = ch;
                     activeInput.dispatchEvent(new Event('input'));
                 }
@@ -82,6 +84,14 @@ function setState(letter, state) {
     const element = tileElements[letter];
     if (element) {
         element.className = 'tile' + (state !== 'unknown' ? ' ' + state : '');
+    }
+    const popupElement = popupLetterElements[letter];
+    if (popupElement) {
+        if (state === 'absent') {
+            popupElement.classList.add('disabled');
+        } else {
+            popupElement.classList.remove('disabled');
+        }
     }
 }
 

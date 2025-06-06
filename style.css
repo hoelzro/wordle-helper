@@ -92,6 +92,13 @@ body {
     text-transform: uppercase;
 }
 
+.alphabet-popup .popup-letter.disabled {
+    background-color: #eee;
+    color: #888;
+    cursor: default;
+    pointer-events: none;
+}
+
 .alphabet-popup .popup-clear {
     margin-top: 4px;
     padding: 2px 4px;
