@@ -4,6 +4,7 @@ const letterStates = {};
 const tileElements = {};
 const popupLetterElements = {};
 let activeInput = null;
+let showList = false;
 
 function createPopup() {
     const popup = document.getElementById('alphabet-popup');
@@ -59,6 +60,19 @@ function hidePopup() {
     activeInput = null;
     const popup = document.getElementById('alphabet-popup');
     popup.style.display = 'none';
+}
+
+function toggleWordList() {
+    showList = !showList;
+    const list = document.getElementById('word-list');
+    const arrow = document.getElementById('toggle-arrow');
+    if (showList) {
+        list.classList.add('visible');
+        arrow.innerHTML = '&#9660;';
+    } else {
+        list.classList.remove('visible');
+        arrow.innerHTML = '&#9654;';
+    }
 }
 
 function createGrid() {
@@ -156,7 +170,17 @@ function filterWords() {
         return true;
     });
 
-    document.getElementById('result').textContent = `${matches.length} possible words`;
+    matches.sort();
+    const resultEl = document.getElementById('result');
+    const listEl = document.getElementById('word-list');
+
+    resultEl.textContent = `${matches.length} possible words`;
+    listEl.innerHTML = '';
+    matches.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        listEl.appendChild(li);
+    });
 }
 
 async function loadWords() {
@@ -174,6 +198,7 @@ async function loadWords() {
 document.addEventListener('DOMContentLoaded', () => {
     createGrid();
     createPopup();
+    document.getElementById('result-container').addEventListener('click', toggleWordList);
     document.querySelectorAll('#position-row input').forEach(input => {
         input.addEventListener('input', handlePositionInput);
         input.addEventListener('click', () => showPopup(input));

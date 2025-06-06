@@ -111,3 +111,28 @@ body {
     cursor: pointer;
     user-select: none;
 }
+
+.result-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.toggle-arrow {
+    user-select: none;
+}
+
+.word-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.word-list.visible {
+    display: block;
+}
