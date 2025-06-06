@@ -2,6 +2,44 @@ let WORDS = [];
 const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 const letterStates = {};
 const tileElements = {};
+let activeInput = null;
+
+function createPopup() {
+    const popup = document.getElementById('alphabet-popup');
+    'abcdefghijklmnopqrstuvwxyz'.split('').forEach(ch => {
+        const div = document.createElement('div');
+        div.className = 'popup-letter';
+        div.textContent = ch.toUpperCase();
+        div.addEventListener('click', () => {
+            if (activeInput) {
+                activeInput.value = ch;
+                activeInput.dispatchEvent(new Event('input'));
+            }
+            hidePopup();
+        });
+        popup.appendChild(div);
+    });
+    document.addEventListener('click', (e) => {
+        if (!popup.contains(e.target) && !e.target.classList.contains('position-tile')) {
+            hidePopup();
+        }
+    });
+}
+
+function showPopup(input) {
+    activeInput = input;
+    const popup = document.getElementById('alphabet-popup');
+    const rect = input.getBoundingClientRect();
+    popup.style.left = rect.left + window.scrollX + 'px';
+    popup.style.top = rect.bottom + window.scrollY + 5 + 'px';
+    popup.style.display = 'grid';
+}
+
+function hidePopup() {
+    activeInput = null;
+    const popup = document.getElementById('alphabet-popup');
+    popup.style.display = 'none';
+}
 
 function createGrid() {
     const grid = document.getElementById('letter-grid');
@@ -35,9 +73,10 @@ function cycleState(letter) {
     idx = (idx + 1) % states.length;
     setState(letter, states[idx]);
     if (letterStates[letter] === 'absent') {
-        document.querySelectorAll('.positions input').forEach(input => {
+        document.querySelectorAll('#position-row input').forEach(input => {
             if (input.value.toLowerCase() === letter) {
                 input.value = '';
+                input.dispatchEvent(new Event('input'));
             }
         });
     }
@@ -96,8 +135,10 @@ async function loadWords() {
 
 document.addEventListener('DOMContentLoaded', () => {
     createGrid();
-    document.querySelectorAll('.positions input').forEach(input => {
+    createPopup();
+    document.querySelectorAll('#position-row input').forEach(input => {
         input.addEventListener('input', handlePositionInput);
+        input.addEventListener('click', () => showPopup(input));
     });
     loadWords();
 });

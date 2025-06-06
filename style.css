@@ -4,12 +4,30 @@ body {
     line-height: 1.4;
 }
 
-.inputs, .positions, .letter-grid {
+
+.inputs, .position-row, .letter-grid {
     margin-bottom: 10px;
 }
 
-.positions label {
-    margin-right: 5px;
+.position-row {
+    display: flex;
+    justify-content: center;
+}
+
+.position-tile {
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+    border: 2px solid #ccc;
+    text-align: center;
+    line-height: 40px;
+    font-size: 24px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.position-tile:focus {
+    outline: none;
 }
 
 
@@ -41,4 +59,27 @@ body {
 
 .tile.absent {
     background-color: #f88;
+}
+
+.alphabet-popup {
+    position: absolute;
+    display: none;
+    grid-template-columns: repeat(10, 30px);
+    gap: 4px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+
+.alphabet-popup .popup-letter {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+    text-transform: uppercase;
 }
