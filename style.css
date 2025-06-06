@@ -4,10 +4,35 @@ body {
     line-height: 1.4;
 }
 
-.inputs, .positions {
+.inputs, .positions, .letter-grid {
     margin-bottom: 10px;
 }
 
 .positions label {
     margin-right: 5px;
+}
+
+.letter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    width: 210px;
+}
+
+.letter-grid .tile {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ccc;
+    margin: 2px;
+    text-align: center;
+    line-height: 28px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tile.present {
+    background-color: #8f8;
+}
+
+.tile.absent {
+    background-color: #f88;
 }

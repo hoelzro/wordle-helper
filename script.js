@@ -1,8 +1,31 @@
 let WORDS = [];
+const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
+const letterStates = {};
+
+function createGrid() {
+    const grid = document.getElementById('letter-grid');
+    LETTERS.split('').forEach(letter => {
+        letterStates[letter] = 'unknown';
+        const div = document.createElement('div');
+        div.className = 'tile';
+        div.textContent = letter.toUpperCase();
+        div.addEventListener('click', () => cycleState(letter, div));
+        grid.appendChild(div);
+    });
+}
+
+function cycleState(letter, element) {
+    const states = ['unknown', 'present', 'absent'];
+    let idx = states.indexOf(letterStates[letter]);
+    idx = (idx + 1) % states.length;
+    letterStates[letter] = states[idx];
+    element.className = 'tile' + (letterStates[letter] !== 'unknown' ? ' ' + letterStates[letter] : '');
+    filterWords();
+}
 
 function filterWords() {
-    const present = document.getElementById('present').value.toLowerCase().replace(/[^a-z]/g, '');
-    const absent = document.getElementById('absent').value.toLowerCase().replace(/[^a-z]/g, '');
+    const present = Object.keys(letterStates).filter(l => letterStates[l] === 'present');
+    const absent = Object.keys(letterStates).filter(l => letterStates[l] === 'absent');
     const positions = [];
     for (let i = 0; i < 5; i++) {
         const val = document.getElementById('pos' + i).value.toLowerCase().replace(/[^a-z]/g, '');
@@ -38,7 +61,8 @@ async function loadWords() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('input').forEach(input => {
+    createGrid();
+    document.querySelectorAll('.positions input').forEach(input => {
         input.addEventListener('input', filterWords);
     });
     loadWords();
