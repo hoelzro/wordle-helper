@@ -6,18 +6,23 @@ let activeInput = null;
 
 function createPopup() {
     const popup = document.getElementById('alphabet-popup');
-    'abcdefghijklmnopqrstuvwxyz'.split('').forEach(ch => {
-        const div = document.createElement('div');
-        div.className = 'popup-letter';
-        div.textContent = ch.toUpperCase();
-        div.addEventListener('click', () => {
-            if (activeInput) {
-                activeInput.value = ch;
-                activeInput.dispatchEvent(new Event('input'));
-            }
-            hidePopup();
+    KEYBOARD_ROWS.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'popup-row';
+        row.split('').forEach(ch => {
+            const div = document.createElement('div');
+            div.className = 'popup-letter';
+            div.textContent = ch.toUpperCase();
+            div.addEventListener('click', () => {
+                if (activeInput) {
+                    activeInput.value = ch;
+                    activeInput.dispatchEvent(new Event('input'));
+                }
+                hidePopup();
+            });
+            rowDiv.appendChild(div);
         });
-        popup.appendChild(div);
+        popup.appendChild(rowDiv);
     });
     document.addEventListener('click', (e) => {
         if (!popup.contains(e.target) && !e.target.classList.contains('position-tile')) {
@@ -32,7 +37,7 @@ function showPopup(input) {
     const rect = input.getBoundingClientRect();
     popup.style.left = rect.left + window.scrollX + 'px';
     popup.style.top = rect.bottom + window.scrollY + 5 + 'px';
-    popup.style.display = 'grid';
+    popup.style.display = 'flex';
 }
 
 function hidePopup() {
