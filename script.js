@@ -1,3 +1,5 @@
+let WORDS = [];
+
 function filterWords() {
     const present = document.getElementById('present').value.toLowerCase().replace(/[^a-z]/g, '');
     const absent = document.getElementById('absent').value.toLowerCase().replace(/[^a-z]/g, '');
@@ -23,8 +25,21 @@ function filterWords() {
     document.getElementById('result').textContent = `${matches.length} possible words`;
 }
 
-document.querySelectorAll('input').forEach(input => {
-    input.addEventListener('input', filterWords);
-});
+async function loadWords() {
+    try {
+        const response = await fetch('words.txt');
+        const text = await response.text();
+        WORDS = text.split(/\r?\n/).map(w => w.trim()).filter(Boolean);
+    } catch (err) {
+        console.error('Failed to load words:', err);
+        WORDS = [];
+    }
+    filterWords();
+}
 
-document.addEventListener('DOMContentLoaded', filterWords);
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', filterWords);
+    });
+    loadWords();
+});
