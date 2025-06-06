@@ -12,10 +12,16 @@ body {
     margin-right: 5px;
 }
 
+
 .letter-grid {
+    display: inline-flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.letter-row {
     display: flex;
-    flex-wrap: wrap;
-    width: 210px;
+    justify-content: center;
 }
 
 .letter-grid .tile {
