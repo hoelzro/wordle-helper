@@ -1,0 +1,130 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+
+.inputs, .position-row, .letter-grid {
+    margin-bottom: 10px;
+}
+
+.position-row {
+    display: flex;
+    justify-content: center;
+}
+
+.position-tile {
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+    border: 2px solid #ccc;
+    text-align: center;
+    line-height: 40px;
+    font-size: 24px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.position-tile:focus {
+    outline: none;
+}
+
+
+.letter-grid {
+    display: inline-flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.letter-row {
+    display: flex;
+    justify-content: center;
+}
+
+.letter-grid .tile {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ccc;
+    margin: 2px;
+    text-align: center;
+    line-height: 28px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tile.present {
+    background-color: #8f8;
+}
+
+.tile.absent {
+    background-color: #f88;
+}
+
+
+.alphabet-popup {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 100;
+    width: fit-content;
+}
+
+.popup-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.alphabet-popup .popup-letter {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+    text-transform: uppercase;
+}
+
+.alphabet-popup .popup-letter.disabled {
+    background-color: #eee;
+    color: #888;
+    cursor: default;
+    pointer-events: none;
+}
+
+.alphabet-popup .popup-clear {
+    margin-top: 4px;
+    padding: 2px 4px;
+    text-align: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+}
+
+.word-list-container {
+    margin-top: 10px;
+}
+
+.word-list-container summary {
+    cursor: pointer;
+    user-select: none;
+}
+
+.word-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
