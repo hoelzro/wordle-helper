@@ -24,6 +24,17 @@ function createPopup() {
         });
         popup.appendChild(rowDiv);
     });
+    const clearDiv = document.createElement('div');
+    clearDiv.className = 'popup-clear';
+    clearDiv.textContent = 'Clear';
+    clearDiv.addEventListener('click', () => {
+        if (activeInput) {
+            activeInput.value = '';
+            activeInput.dispatchEvent(new Event('input'));
+        }
+        hidePopup();
+    });
+    popup.appendChild(clearDiv);
     document.addEventListener('click', (e) => {
         if (!popup.contains(e.target) && !e.target.classList.contains('position-tile')) {
             hidePopup();
@@ -89,12 +100,21 @@ function cycleState(letter) {
 }
 
 function handlePositionInput(e) {
-    let val = e.target.value.toLowerCase().replace(/[^a-z]/g, '');
+    const input = e.target;
+    let val = input.value.toLowerCase().replace(/[^a-z]/g, '');
     if (val.length > 1) val = val[0];
     if (val && letterStates[val] === 'absent') {
         val = '';
     }
-    e.target.value = val;
+    const prev = input.dataset.prev || '';
+    if (prev && prev !== val) {
+        const stillUsed = Array.from(document.querySelectorAll('#position-row input')).some(el => el !== input && el.value.toLowerCase() === prev);
+        if (!stillUsed && letterStates[prev] === 'present') {
+            setState(prev, 'unknown');
+        }
+    }
+    input.value = val;
+    input.dataset.prev = val;
     if (val) {
         setState(val, 'present');
     }
@@ -144,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#position-row input').forEach(input => {
         input.addEventListener('input', handlePositionInput);
         input.addEventListener('click', () => showPopup(input));
+        input.dataset.prev = '';
     });
     loadWords();
 });
