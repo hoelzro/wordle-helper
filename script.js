@@ -30,7 +30,9 @@ function createPopup() {
     clearDiv.addEventListener('click', () => {
         if (activeInput) {
             activeInput.value = '';
+            activeInput.dataset.keepPresent = 'true';
             activeInput.dispatchEvent(new Event('input'));
+            delete activeInput.dataset.keepPresent;
         }
         hidePopup();
     });
@@ -101,6 +103,7 @@ function cycleState(letter) {
 
 function handlePositionInput(e) {
     const input = e.target;
+    const keepPresent = input.dataset.keepPresent === 'true';
     let val = input.value.toLowerCase().replace(/[^a-z]/g, '');
     if (val.length > 1) val = val[0];
     if (val && letterStates[val] === 'absent') {
@@ -109,7 +112,7 @@ function handlePositionInput(e) {
     const prev = input.dataset.prev || '';
     if (prev && prev !== val) {
         const stillUsed = Array.from(document.querySelectorAll('#position-row input')).some(el => el !== input && el.value.toLowerCase() === prev);
-        if (!stillUsed && letterStates[prev] === 'present') {
+        if (!stillUsed && letterStates[prev] === 'present' && !keepPresent) {
             setState(prev, 'unknown');
         }
     }
