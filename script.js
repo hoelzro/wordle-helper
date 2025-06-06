@@ -186,9 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
     createGrid();
     createPopup();
     document.querySelectorAll('#position-row input').forEach(input => {
+        input.value = '';
+        input.dataset.prev = '';
         input.addEventListener('input', handlePositionInput);
         input.addEventListener('click', () => showPopup(input));
-        input.dataset.prev = '';
     });
     loadWords();
 });
