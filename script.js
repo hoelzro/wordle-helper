@@ -61,6 +61,7 @@ function hidePopup() {
     popup.style.display = 'none';
 }
 
+
 function createGrid() {
     const grid = document.getElementById('letter-grid');
     KEYBOARD_ROWS.forEach(row => {
@@ -156,7 +157,17 @@ function filterWords() {
         return true;
     });
 
-    document.getElementById('result').textContent = `${matches.length} possible words`;
+    matches.sort();
+    const resultEl = document.getElementById('result');
+    const listEl = document.getElementById('word-list');
+
+    resultEl.textContent = `${matches.length} possible words`;
+    listEl.innerHTML = '';
+    matches.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        listEl.appendChild(li);
+    });
 }
 
 async function loadWords() {

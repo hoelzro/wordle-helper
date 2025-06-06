@@ -111,3 +111,20 @@ body {
     cursor: pointer;
     user-select: none;
 }
+
+.word-list-container {
+    margin-top: 10px;
+}
+
+.word-list-container summary {
+    cursor: pointer;
+    user-select: none;
+}
+
+.word-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
