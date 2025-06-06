@@ -1,0 +1,13 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    line-height: 1.4;
+}
+
+.inputs, .positions {
+    margin-bottom: 10px;
+}
+
+.positions label {
+    margin-right: 5px;
+}

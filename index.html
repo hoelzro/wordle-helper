@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wordle Helper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Wordle Helper</h1>
+    <div class="inputs">
+        <label>
+            Letters present:
+            <input type="text" id="present" />
+        </label>
+    </div>
+    <div class="inputs">
+        <label>
+            Letters absent:
+            <input type="text" id="absent" />
+        </label>
+    </div>
+    <div class="positions">
+        <label>Pos1: <input type="text" id="pos0" maxlength="1" /></label>
+        <label>Pos2: <input type="text" id="pos1" maxlength="1" /></label>
+        <label>Pos3: <input type="text" id="pos2" maxlength="1" /></label>
+        <label>Pos4: <input type="text" id="pos3" maxlength="1" /></label>
+        <label>Pos5: <input type="text" id="pos4" maxlength="1" /></label>
+    </div>
+    <p id="result">0 possible words</p>
+    <script src="words.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
