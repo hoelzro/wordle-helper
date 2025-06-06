@@ -1,16 +1,21 @@
 let WORDS = [];
-const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
+const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 const letterStates = {};
 
 function createGrid() {
     const grid = document.getElementById('letter-grid');
-    LETTERS.split('').forEach(letter => {
-        letterStates[letter] = 'unknown';
-        const div = document.createElement('div');
-        div.className = 'tile';
-        div.textContent = letter.toUpperCase();
-        div.addEventListener('click', () => cycleState(letter, div));
-        grid.appendChild(div);
+    KEYBOARD_ROWS.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'letter-row';
+        row.split('').forEach(letter => {
+            letterStates[letter] = 'unknown';
+            const div = document.createElement('div');
+            div.className = 'tile';
+            div.textContent = letter.toUpperCase();
+            div.addEventListener('click', () => cycleState(letter, div));
+            rowDiv.appendChild(div);
+        });
+        grid.appendChild(rowDiv);
     });
 }
 
