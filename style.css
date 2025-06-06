@@ -112,15 +112,12 @@ body {
     user-select: none;
 }
 
-.result-container {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
+.word-list-container {
     margin-top: 10px;
 }
 
-.toggle-arrow {
+.word-list-container summary {
+    cursor: pointer;
     user-select: none;
 }
 
@@ -130,9 +127,4 @@ body {
     margin: 0;
     max-height: 200px;
     overflow-y: auto;
-    display: none;
-}
-
-.word-list.visible {
-    display: block;
 }
