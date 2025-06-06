@@ -91,3 +91,12 @@ body {
     user-select: none;
     text-transform: uppercase;
 }
+
+.alphabet-popup .popup-clear {
+    margin-top: 4px;
+    padding: 2px 4px;
+    text-align: center;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+}
