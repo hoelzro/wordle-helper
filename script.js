@@ -86,6 +86,7 @@ function createGrid() {
             input.type = 'number';
             input.min = '0';
             input.max = '5';
+            input.step = '1';
             input.value = '0';
             input.className = 'count-input';
             input.addEventListener('input', () => {
