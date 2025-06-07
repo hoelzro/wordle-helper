@@ -1,6 +1,7 @@
 let WORDS = [];
 const KEYBOARD_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
 const letterStates = {};
+const letterCounts = {};
 const tileElements = {};
 const popupLetterElements = {};
 let activeInput = null;
@@ -69,12 +70,34 @@ function createGrid() {
         rowDiv.className = 'letter-row';
         row.split('').forEach(letter => {
             letterStates[letter] = 'unknown';
+            letterCounts[letter] = 0;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'tile-container';
+
             const div = document.createElement('div');
             div.className = 'tile';
             div.textContent = letter.toUpperCase();
             div.addEventListener('click', () => cycleState(letter));
-            rowDiv.appendChild(div);
+            wrapper.appendChild(div);
             tileElements[letter] = div;
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.max = '5';
+            input.value = '0';
+            input.className = 'count-input';
+            input.addEventListener('input', () => {
+                letterCounts[letter] = parseInt(input.value, 10) || 0;
+                if (letterCounts[letter] > 0 && letterStates[letter] === 'unknown') {
+                    setState(letter, 'present');
+                }
+                filterWords();
+            });
+            wrapper.appendChild(input);
+
+            rowDiv.appendChild(wrapper);
         });
         grid.appendChild(rowDiv);
     });
@@ -138,6 +161,7 @@ function handlePositionInput(e) {
 function filterWords() {
     const present = Object.keys(letterStates).filter(l => letterStates[l] === 'present');
     const absent = Object.keys(letterStates).filter(l => letterStates[l] === 'absent');
+    const counts = { ...letterCounts };
     const positions = [];
     for (let i = 0; i < 5; i++) {
         const val = document.getElementById('pos' + i).value.toLowerCase().replace(/[^a-z]/g, '');
@@ -150,6 +174,12 @@ function filterWords() {
         }
         for (const p of present) {
             if (!word.includes(p)) return false;
+        }
+        for (const [ltr, cnt] of Object.entries(counts)) {
+            if (cnt > 0) {
+                const occurrences = word.split(ltr).length - 1;
+                if (occurrences !== cnt) return false;
+            }
         }
         for (let i = 0; i < 5; i++) {
             if (positions[i] && word[i] !== positions[i]) return false;
