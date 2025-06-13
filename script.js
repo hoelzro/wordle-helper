@@ -147,13 +147,20 @@ function handlePositionInput(e) {
     const prev = input.dataset.prev || '';
     if (prev && prev !== val) {
         const stillUsed = Array.from(document.querySelectorAll('#position-row input')).some(el => el !== input && el.value.toLowerCase() === prev);
-        if (!stillUsed && letterStates[prev] === 'present' && !keepPresent) {
+        if (!stillUsed && input.dataset.addedPresent === prev && !keepPresent) {
             setState(prev, 'unknown');
         }
+        input.dataset.addedPresent = '';
     }
     input.value = val;
     input.dataset.prev = val;
     if (val) {
+        const usedElsewhere = Array.from(document.querySelectorAll('#position-row input')).some(el => el !== input && el.value.toLowerCase() === val);
+        if (letterStates[val] === 'unknown' && !usedElsewhere && letterCounts[val] === 0) {
+            input.dataset.addedPresent = val;
+        } else {
+            input.dataset.addedPresent = '';
+        }
         setState(val, 'present');
     }
     filterWords();
@@ -219,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#position-row input').forEach(input => {
         input.value = '';
         input.dataset.prev = '';
+        input.dataset.addedPresent = '';
         input.addEventListener('input', handlePositionInput);
         input.addEventListener('click', () => showPopup(input));
     });
