@@ -4,6 +4,8 @@ const letterStates = {};
 const letterCounts = {};
 const tileElements = {};
 const popupLetterElements = {};
+const countInputElements = {};
+let sessionId = null;
 let activeInput = null;
 
 function createPopup() {
@@ -62,6 +64,15 @@ function hidePopup() {
     popup.style.display = 'none';
 }
 
+function getSessionId() {
+    let id = sessionStorage.getItem('wordleHelperSession');
+    if (!id) {
+        id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+        sessionStorage.setItem('wordleHelperSession', id);
+    }
+    return id;
+}
+
 
 function createGrid() {
     const grid = document.getElementById('letter-grid');
@@ -97,6 +108,7 @@ function createGrid() {
                 filterWords();
             });
             wrapper.appendChild(input);
+            countInputElements[letter] = input;
 
             rowDiv.appendChild(wrapper);
         });
@@ -166,6 +178,65 @@ function handlePositionInput(e) {
     filterWords();
 }
 
+function saveState() {
+    const positions = [];
+    document.querySelectorAll('#position-row input').forEach(input => {
+        positions.push(input.value.toLowerCase());
+    });
+    const state = {
+        letterStates,
+        letterCounts,
+        positions
+    };
+    try {
+        localStorage.setItem('wordleHelperState-' + sessionId, JSON.stringify(state));
+    } catch (err) {
+        console.error('Failed to save state', err);
+    }
+}
+
+function loadState() {
+    let data;
+    try {
+        data = localStorage.getItem('wordleHelperState-' + sessionId);
+    } catch (err) {
+        console.error('Failed to access storage', err);
+        return;
+    }
+    if (!data) return;
+    try {
+        const state = JSON.parse(data);
+        if (state.letterStates) {
+            Object.keys(state.letterStates).forEach(letter => {
+                if (letterStates.hasOwnProperty(letter)) {
+                    setState(letter, state.letterStates[letter]);
+                }
+            });
+        }
+        if (state.letterCounts) {
+            Object.keys(state.letterCounts).forEach(letter => {
+                if (letterCounts.hasOwnProperty(letter)) {
+                    letterCounts[letter] = state.letterCounts[letter];
+                    if (countInputElements[letter]) {
+                        countInputElements[letter].value = state.letterCounts[letter];
+                    }
+                }
+            });
+        }
+        if (Array.isArray(state.positions)) {
+            document.querySelectorAll('#position-row input').forEach((input, i) => {
+                const val = state.positions[i] || '';
+                input.value = val;
+                input.dataset.prev = val;
+                input.dataset.addedPresent = '';
+            });
+        }
+    } catch (err) {
+        console.error('Failed to load state', err);
+    }
+    filterWords();
+}
+
 function filterWords() {
     const present = Object.keys(letterStates).filter(l => letterStates[l] === 'present');
     const absent = Object.keys(letterStates).filter(l => letterStates[l] === 'absent');
@@ -206,6 +277,7 @@ function filterWords() {
         li.textContent = word;
         listEl.appendChild(li);
     });
+    saveState();
 }
 
 async function loadWords() {
@@ -221,14 +293,15 @@ async function loadWords() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    sessionId = getSessionId();
     createGrid();
     createPopup();
     document.querySelectorAll('#position-row input').forEach(input => {
-        input.value = '';
-        input.dataset.prev = '';
-        input.dataset.addedPresent = '';
         input.addEventListener('input', handlePositionInput);
         input.addEventListener('click', () => showPopup(input));
+        input.dataset.prev = '';
+        input.dataset.addedPresent = '';
     });
+    loadState();
     loadWords();
 });
