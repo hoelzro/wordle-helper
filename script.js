@@ -7,6 +7,7 @@ const popupLetterElements = {};
 const countInputElements = {};
 let sessionId = null;
 let activeInput = null;
+let pageLoadTime = null;
 
 function createPopup() {
     const popup = document.getElementById('alphabet-popup');
@@ -69,6 +70,9 @@ function getSessionId() {
     if (!id) {
         id = Date.now().toString(36) + Math.random().toString(36).slice(2);
         sessionStorage.setItem('wordleHelperSession', id);
+        const initTime = new Date().toISOString();
+        sessionStorage.setItem('wordleHelperInitTime', initTime);
+        console.log('Session initialized at', initTime);
     }
     return id;
 }
@@ -292,8 +296,17 @@ async function loadWords() {
     filterWords();
 }
 
+function updateDiagnostics() {
+    const infoEl = document.getElementById('diagnostic-info');
+    if (!infoEl) return;
+    const initTime = sessionStorage.getItem('wordleHelperInitTime');
+    infoEl.textContent = `Session init: ${initTime} | Page loaded: ${pageLoadTime} | Current: ${new Date().toISOString()}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     sessionId = getSessionId();
+    pageLoadTime = new Date().toISOString();
+    console.log('Page loaded at', pageLoadTime);
     createGrid();
     createPopup();
     document.querySelectorAll('#position-row input').forEach(input => {
@@ -304,4 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     loadState();
     loadWords();
+    updateDiagnostics();
+    setInterval(updateDiagnostics, 60000);
 });
