@@ -104,6 +104,17 @@ function createGrid() {
             input.step = '1';
             input.value = '0';
             input.className = 'count-input';
+            input.addEventListener('keydown', e => {
+                if (/^[0-5]$/.test(e.key)) {
+                    e.preventDefault();
+                    input.value = e.key;
+                    input.dispatchEvent(new Event('input'));
+                } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                    e.preventDefault();
+                    input.value = '0';
+                    input.dispatchEvent(new Event('input'));
+                }
+            });
             input.addEventListener('input', () => {
                 letterCounts[letter] = parseInt(input.value, 10) || 0;
                 if (letterCounts[letter] > 0 && letterStates[letter] === 'unknown') {
