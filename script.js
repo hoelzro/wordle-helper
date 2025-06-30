@@ -36,9 +36,7 @@ function createPopup() {
     clearDiv.addEventListener('click', () => {
         if (activeInput) {
             activeInput.value = '';
-            activeInput.dataset.keepPresent = 'true';
             activeInput.dispatchEvent(new Event('input'));
-            delete activeInput.dataset.keepPresent;
         }
         hidePopup();
     });
