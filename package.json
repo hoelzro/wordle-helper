@@ -1,0 +1,16 @@
+{
+  "name": "wordle-helper",
+  "version": "1.0.0",
+  "description": "A simple single-page application to help filter Wordle words.",
+  "main": "script.js",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "playwright": "^1.53.1"
+  }
+}
