@@ -56,4 +56,15 @@ test.describe('Wordle Helper', () => {
     await input.type('3');
     await expect(input).toHaveValue('3');
   });
+
+  test('clearing position resets auto-added present', async ({ page }) => {
+    await page.goto(baseURL);
+    await page.fill('#pos3', 'e');
+    const tile = page.locator('.tile', { hasText: 'E' });
+    await expect(tile).toHaveClass(/present/);
+    await page.click('#pos3');
+    await page.click('#alphabet-popup .popup-clear');
+    await expect(page.locator('#pos3')).toHaveValue('');
+    await expect(tile).not.toHaveClass(/present/);
+  });
 });
