@@ -30,6 +30,10 @@ body {
     cursor: pointer;
 }
 
+.position-tile.not-here {
+    background-color: #ffea70;
+}
+
 .position-tile:focus {
     outline: none;
 }

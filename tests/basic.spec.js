@@ -18,7 +18,8 @@ test.describe('Wordle Helper', () => {
 
   test('filters by first letter', async ({ page }) => {
     await page.goto(baseURL);
-    await page.fill('#pos0', 'a');
+    await page.click('#pos0');
+    await page.click('#alphabet-popup .popup-letter:has-text("A")');
     const expected = countWordsStartingWith('a');
     await expect(page.locator('#result')).toHaveText(`${expected} possible words`);
     const list = await page.$$eval('#word-list li', els => els.map(el => el.textContent));
@@ -31,7 +32,7 @@ test.describe('Wordle Helper', () => {
     await expect(page.locator('#alphabet-popup')).toBeVisible();
     await page.click('#alphabet-popup .popup-letter:has-text("B")');
     await expect(page.locator('#alphabet-popup')).toBeHidden();
-    await expect(page.locator('#pos1')).toHaveValue('b');
+    await expect(page.locator('#pos1')).toHaveText('B');
     await expect(page.locator('.tile', { hasText: 'B' })).toHaveClass(/present/);
   });
 
@@ -59,12 +60,13 @@ test.describe('Wordle Helper', () => {
 
   test('clearing position resets auto-added present', async ({ page }) => {
     await page.goto(baseURL);
-    await page.fill('#pos3', 'e');
+    await page.click('#pos3');
+    await page.click('#alphabet-popup .popup-letter:has-text("E")');
     const tile = page.locator('.tile', { hasText: 'E' });
     await expect(tile).toHaveClass(/present/);
     await page.click('#pos3');
-    await page.click('#alphabet-popup .popup-clear');
-    await expect(page.locator('#pos3')).toHaveValue('');
+    await page.click('#pos3');
+    await expect(page.locator('#pos3')).toHaveText('');
     await expect(tile).not.toHaveClass(/present/);
   });
 });

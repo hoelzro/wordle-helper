@@ -6,7 +6,7 @@ const tileElements = {};
 const popupLetterElements = {};
 const countInputElements = {};
 let sessionId = null;
-let activeInput = null;
+let activeTile = null;
 let pageLoadTime = null;
 
 function createPopup() {
@@ -20,9 +20,8 @@ function createPopup() {
             div.textContent = ch.toUpperCase();
             popupLetterElements[ch] = div;
             div.addEventListener('click', () => {
-                if (letterStates[ch] !== 'absent' && activeInput) {
-                    activeInput.value = ch;
-                    activeInput.dispatchEvent(new Event('input'));
+                if (letterStates[ch] !== 'absent' && activeTile) {
+                    setTileLetter(activeTile, ch);
                 }
                 hidePopup();
             });
@@ -34,9 +33,8 @@ function createPopup() {
     clearDiv.className = 'popup-clear';
     clearDiv.textContent = 'Clear';
     clearDiv.addEventListener('click', () => {
-        if (activeInput) {
-            activeInput.value = '';
-            activeInput.dispatchEvent(new Event('input'));
+        if (activeTile) {
+            clearPositionTile(activeTile);
         }
         hidePopup();
     });
@@ -48,17 +46,17 @@ function createPopup() {
     });
 }
 
-function showPopup(input) {
-    activeInput = input;
+function showPopup(tile) {
+    activeTile = tile;
     const popup = document.getElementById('alphabet-popup');
-    const rect = input.getBoundingClientRect();
+    const rect = tile.getBoundingClientRect();
     popup.style.left = rect.left + window.scrollX + 'px';
     popup.style.top = rect.bottom + window.scrollY + 5 + 'px';
     popup.style.display = 'flex';
 }
 
 function hidePopup() {
-    activeInput = null;
+    activeTile = null;
     const popup = document.getElementById('alphabet-popup');
     popup.style.display = 'none';
 }
@@ -151,50 +149,80 @@ function cycleState(letter) {
     idx = (idx + 1) % states.length;
     setState(letter, states[idx]);
     if (letterStates[letter] === 'absent') {
-        document.querySelectorAll('#position-row input').forEach(input => {
-            if (input.value.toLowerCase() === letter) {
-                input.value = '';
-                input.dispatchEvent(new Event('input'));
+        document.querySelectorAll('#position-row .position-tile').forEach(tile => {
+            if (tile.dataset.letter === letter) {
+                clearPositionTile(tile);
             }
         });
     }
     filterWords();
 }
 
-function handlePositionInput(e) {
-    const input = e.target;
-    const keepPresent = input.dataset.keepPresent === 'true';
-    let val = input.value.toLowerCase().replace(/[^a-z]/g, '');
-    if (val.length > 1) val = val[0];
-    if (val && letterStates[val] === 'absent') {
-        val = '';
-    }
-    const prev = input.dataset.prev || '';
-    if (prev && prev !== val) {
-        const stillUsed = Array.from(document.querySelectorAll('#position-row input')).some(el => el !== input && el.value.toLowerCase() === prev);
-        if (!stillUsed && input.dataset.addedPresent === prev && !keepPresent) {
+function setTileLetter(tile, letter) {
+    const keepPresent = tile.dataset.keepPresent === 'true';
+    const prev = tile.dataset.letter || '';
+    if (prev && prev !== letter) {
+        const stillUsed = Array.from(document.querySelectorAll('#position-row .position-tile'))
+            .some(t => t !== tile && t.dataset.letter === prev && t.dataset.state !== 'unknown');
+        if (!stillUsed && tile.dataset.addedPresent === prev && !keepPresent) {
             setState(prev, 'unknown');
         }
-        input.dataset.addedPresent = '';
+        tile.dataset.addedPresent = '';
     }
-    input.value = val;
-    input.dataset.prev = val;
-    if (val) {
-        const usedElsewhere = Array.from(document.querySelectorAll('#position-row input')).some(el => el !== input && el.value.toLowerCase() === val);
-        if (letterStates[val] === 'unknown' && !usedElsewhere && letterCounts[val] === 0) {
-            input.dataset.addedPresent = val;
-        } else {
-            input.dataset.addedPresent = '';
+    tile.dataset.letter = letter;
+    tile.dataset.state = 'exact';
+    tile.textContent = letter.toUpperCase();
+    tile.classList.remove('not-here');
+    const usedElsewhere = Array.from(document.querySelectorAll('#position-row .position-tile'))
+        .some(t => t !== tile && t.dataset.letter === letter && t.dataset.state !== 'unknown');
+    if (letterStates[letter] === 'unknown' && !usedElsewhere && letterCounts[letter] === 0) {
+        tile.dataset.addedPresent = letter;
+    } else {
+        tile.dataset.addedPresent = '';
+    }
+    setState(letter, 'present');
+    filterWords();
+}
+
+function clearPositionTile(tile) {
+    const prev = tile.dataset.letter || '';
+    const keepPresent = tile.dataset.keepPresent === 'true';
+    tile.dataset.letter = '';
+    tile.dataset.state = 'unknown';
+    tile.textContent = '';
+    tile.classList.remove('not-here');
+    if (prev) {
+        const stillUsed = Array.from(document.querySelectorAll('#position-row .position-tile'))
+            .some(t => t !== tile && t.dataset.letter === prev && t.dataset.state !== 'unknown');
+        if (!stillUsed && tile.dataset.addedPresent === prev && !keepPresent) {
+            setState(prev, 'unknown');
         }
-        setState(val, 'present');
+        tile.dataset.addedPresent = '';
     }
     filterWords();
 }
 
+function handlePositionTileClick(tile) {
+    const state = tile.dataset.state || 'unknown';
+    if (state === 'unknown') {
+        showPopup(tile);
+    } else if (state === 'exact') {
+        tile.dataset.state = 'notHere';
+        tile.classList.add('not-here');
+        setState(tile.dataset.letter, 'present');
+        filterWords();
+    } else if (state === 'notHere') {
+        clearPositionTile(tile);
+    }
+}
+
 function saveState() {
     const positions = [];
-    document.querySelectorAll('#position-row input').forEach(input => {
-        positions.push(input.value.toLowerCase());
+    document.querySelectorAll('#position-row .position-tile').forEach(tile => {
+        positions.push({
+            letter: tile.dataset.letter || '',
+            state: tile.dataset.state || 'unknown'
+        });
     });
     const state = {
         letterStates,
@@ -237,11 +265,18 @@ function loadState() {
             });
         }
         if (Array.isArray(state.positions)) {
-            document.querySelectorAll('#position-row input').forEach((input, i) => {
-                const val = state.positions[i] || '';
-                input.value = val;
-                input.dataset.prev = val;
-                input.dataset.addedPresent = '';
+            document.querySelectorAll('#position-row .position-tile').forEach((tile, i) => {
+                const info = state.positions[i] || { letter: '', state: 'unknown' };
+                tile.dataset.letter = info.letter || '';
+                tile.dataset.state = info.state || 'unknown';
+                tile.textContent = info.letter ? info.letter.toUpperCase() : '';
+                if (info.state === 'notHere') {
+                    tile.classList.add('not-here');
+                } else {
+                    tile.classList.remove('not-here');
+                }
+                tile.dataset.prev = info.letter || '';
+                tile.dataset.addedPresent = '';
             });
         }
     } catch (err) {
@@ -256,8 +291,11 @@ function filterWords() {
     const counts = { ...letterCounts };
     const positions = [];
     for (let i = 0; i < 5; i++) {
-        const val = document.getElementById('pos' + i).value.toLowerCase().replace(/[^a-z]/g, '');
-        positions.push(val);
+        const tile = document.getElementById('pos' + i);
+        positions.push({
+            letter: (tile.dataset.letter || '').toLowerCase(),
+            state: tile.dataset.state || 'unknown'
+        });
     }
 
     const matches = WORDS.filter(word => {
@@ -274,7 +312,14 @@ function filterWords() {
             }
         }
         for (let i = 0; i < 5; i++) {
-            if (positions[i] && word[i] !== positions[i]) return false;
+            const { letter, state } = positions[i];
+            if (state === 'exact' && letter) {
+                if (word[i] !== letter) return false;
+            }
+            if (state === 'notHere' && letter) {
+                if (word[i] === letter) return false;
+                if (!word.includes(letter)) return false;
+            }
         }
         return true;
     });
@@ -318,11 +363,12 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Page loaded at', pageLoadTime);
     createGrid();
     createPopup();
-    document.querySelectorAll('#position-row input').forEach(input => {
-        input.addEventListener('input', handlePositionInput);
-        input.addEventListener('click', () => showPopup(input));
-        input.dataset.prev = '';
-        input.dataset.addedPresent = '';
+    document.querySelectorAll('#position-row .position-tile').forEach(tile => {
+        tile.dataset.state = 'unknown';
+        tile.dataset.letter = '';
+        tile.dataset.prev = '';
+        tile.dataset.addedPresent = '';
+        tile.addEventListener('click', () => handlePositionTileClick(tile));
     });
     loadState();
     loadWords();
