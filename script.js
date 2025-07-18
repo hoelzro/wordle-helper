@@ -50,9 +50,15 @@ function showPopup(tile) {
     activeTile = tile;
     const popup = document.getElementById('alphabet-popup');
     const rect = tile.getBoundingClientRect();
-    popup.style.left = rect.left + window.scrollX + 'px';
-    popup.style.top = rect.bottom + window.scrollY + 5 + 'px';
     popup.style.display = 'flex';
+    const popupWidth = popup.offsetWidth;
+    let left = rect.left + window.scrollX - (popupWidth - rect.width) / 2;
+    const minLeft = window.scrollX + 5;
+    const maxLeft = window.scrollX + document.documentElement.clientWidth - popupWidth - 5;
+    if (left < minLeft) left = minLeft;
+    if (left > maxLeft) left = maxLeft;
+    popup.style.left = left + 'px';
+    popup.style.top = rect.bottom + window.scrollY + 5 + 'px';
 }
 
 function hidePopup() {
