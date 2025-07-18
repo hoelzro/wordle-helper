@@ -1,6 +1,8 @@
 # Wordle Helper
 
 A simple single-page application to help filter Wordle words.
+The word list in `words.txt` now excludes proper nouns so you won't see names
+like "Boris" popping up in your results.
 
 ## Usage
 
