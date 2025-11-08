@@ -13,6 +13,8 @@ function countWordsStartingWith(letter) {
 test.describe('Wordle Helper', () => {
   test('shows all words on first load', async ({ page }) => {
     await page.goto(baseURL);
+    await expect(page).toHaveTitle('Wordle Helper (hi from Codex)');
+    await expect(page.locator('h1')).toHaveText('Wordle Helper (hi from Codex)');
     await expect(page.locator('#result')).toHaveText(`${words.length} possible words`);
   });
 
